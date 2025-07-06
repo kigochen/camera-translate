@@ -3,70 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>圖片翻譯工具 (優化版)</title>
+    <title>圖片翻譯工具 (GCP 代理版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', 'Noto Sans TC', sans-serif;
-        }
-        .aspect-ratio-auto {
-            aspect-ratio: auto;
-        }
-        .loader {
-            border: 5px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 5px solid #3498db;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        body { font-family: 'Inter', 'Noto Sans TC', sans-serif; }
+        .loader { border: 5px solid #f3f3f3; border-radius: 50%; border-top: 5px solid #3498db; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex items-center justify-center p-4">
     <div class="w-full max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
         <div class="p-6 md:p-8">
             <div class="text-center">
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">圖片即時翻譯 (優化版)</h1>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">圖片即時翻譯</h1>
                 <p class="mt-2 text-gray-600 dark:text-gray-400">拍照或上傳圖片，Gemini 將為您辨識文字並翻譯</p>
             </div>
-
-            <!-- 圖片上傳區 -->
             <div class="mt-6">
                 <label for="image-upload" class="relative flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                     <div id="upload-prompt" class="flex flex-col items-center justify-center pt-5 pb-6">
-                        <svg class="w-10 h-10 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                        </svg>
-                        <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">點擊此處上傳</span> 或拖曳圖片</p>
+                        <svg class="w-10 h-10 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/></svg>
+                        <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">點擊此處上傳</span></p>
                         <p class="text-xs text-gray-500 dark:text-gray-400">圖片將在您的裝置上自動壓縮以加快速度</p>
                     </div>
                     <input id="image-upload" type="file" class="hidden" accept="image/*" capture="camera" />
-                    <img id="image-preview" src="" class="hidden absolute inset-0 w-full h-full object-contain rounded-lg aspect-ratio-auto p-2" alt="圖片預覽">
+                    <img id="image-preview" src="" class="hidden absolute inset-0 w-full h-full object-contain rounded-lg p-2" alt="圖片預覽">
                 </label>
             </div> 
-
-            <!-- 控制按鈕 -->
             <div class="mt-6 text-center">
-                <button id="translate-btn" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none" disabled>
-                    開始翻譯
-                </button>
+                <button id="translate-btn" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none" disabled>開始翻譯</button>
             </div>
-
-            <!-- 載入動畫與錯誤訊息 -->
             <div id="status-container" class="mt-6 text-center hidden">
                 <div id="loader" class="loader mx-auto"></div>
-                <p id="status-text" class="mt-4 text-gray-600 dark:text-gray-400">正在處理中，請稍候...</p>
+                <p id="status-text" class="mt-4 text-gray-600 dark:text-gray-400"></p>
                 <div id="error-message" class="hidden mt-4 p-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
                     <span class="font-medium">錯誤！</span> <span id="error-text"></span>
                 </div>
             </div>
-
-            <!-- 結果顯示區 -->
             <div id="result-container" class="mt-8 hidden">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
@@ -81,9 +54,7 @@
             </div>
         </div>
     </div>
-
     <script>
-        // DOM 元素
         const imageUpload = document.getElementById('image-upload');
         const imagePreview = document.getElementById('image-preview');
         const uploadPrompt = document.getElementById('upload-prompt');
@@ -96,151 +67,64 @@
         const resultContainer = document.getElementById('result-container');
         const originalText = document.getElementById('original-text');
         const translatedText = document.getElementById('translated-text');
-
         let imageBase64 = null;
 
-        /**
-         * **新增**: 壓縮圖片函式
-         * @param {File} file - 原始圖片檔案
-         * @returns {Promise<string>} - 回傳壓縮後的 Base64 字串
-         */
         function compressImage(file) {
             return new Promise((resolve, reject) => {
-                const MAX_WIDTH = 1920; // 設定圖片最大寬度
-                const MAX_HEIGHT = 1080; // 設定圖片最大高度
-                const MIME_TYPE = "image/jpeg";
-                const QUALITY = 0.8; // 設定圖片品質 (0-1)
-
+                const MAX_WIDTH = 1920, MAX_HEIGHT = 1080, MIME_TYPE = "image/jpeg", QUALITY = 0.8;
                 const blobURL = URL.createObjectURL(file);
                 const img = new Image();
                 img.src = blobURL;
-                img.onerror = () => {
-                    URL.revokeObjectURL(this.src);
-                    reject(new Error("無法載入圖片檔案。"));
-                };
+                img.onerror = () => { URL.revokeObjectURL(img.src); reject(new Error("無法載入圖片檔案。")); };
                 img.onload = () => {
-                    URL.revokeObjectURL(this.src);
+                    URL.revokeObjectURL(img.src);
                     let { width, height } = img;
-
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
-                    }
-
+                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
+                    else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
                     const canvas = document.createElement("canvas");
-                    canvas.width = width;
-                    canvas.height = height;
+                    canvas.width = width; canvas.height = height;
                     const ctx = canvas.getContext("2d");
                     ctx.drawImage(img, 0, 0, width, height);
-                    
-                    // 將 Canvas 內容轉換為 Base64
-                    const dataUrl = canvas.toDataURL(MIME_TYPE, QUALITY);
-                    resolve(dataUrl);
+                    resolve(canvas.toDataURL(MIME_TYPE, QUALITY));
                 };
             });
         }
 
-        /**
-         * **修改**: 處理圖片選擇事件，加入壓縮流程
-         */
         imageUpload.addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (!file) return;
-
-            // **修改**: 顯示處理中狀態，因為壓縮需要一點時間
             showLoading(true, '正在壓縮圖片...');
             resultContainer.classList.add('hidden');
             errorMessage.classList.add('hidden');
-            
             try {
-                // **修改**: 呼叫壓縮函式
                 const compressedDataUrl = await compressImage(file);
-                
-                // 顯示預覽
                 imagePreview.src = compressedDataUrl;
                 imagePreview.classList.remove('hidden');
                 uploadPrompt.classList.add('hidden');
-                
-                // 儲存 Base64 (移除 data URL 前綴)
                 imageBase64 = compressedDataUrl.split(',')[1];
-                
-                // 啟用按鈕
                 translateBtn.disabled = false;
-                showLoading(false); // 隱藏載入狀態
-
+                showLoading(false);
             } catch (err) {
-                console.error('圖片壓縮失敗:', err);
                 showError(err.message);
                 showLoading(false);
             }
         });
 
-        /**
-         * 處理翻譯按鈕點擊事件
-         */
         translateBtn.addEventListener('click', async () => {
-            if (!imageBase64) {
-                showError('請先選擇一張圖片。');
-                return;
-            }
-
+            if (!imageBase64) { showError('請先選擇一張圖片。'); return; }
             showLoading(true, 'Gemini 正在辨識與翻譯...');
-
             try {
-                const apiKey = ""; // API 金鑰將由 Canvas 環境自動提供
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-                
+                const proxyUrl = 'https://gemini-image-proxy-326438924861.asia-east1.run.app'; // <-- 務必替換成您自己的 URL
+                if (proxyUrl.includes('請在此貼上')) { throw new Error('開發者尚未設定代理伺服器 URL。'); }
                 const prompt = "請從這張圖片中提取所有文字，然後將提取的文字完整翻譯成繁體中文。請用以下格式回覆，不要有任何額外說明文字：\n[原文開始]\n(這裡放提取的原文)\n[原文結束]\n[翻譯開始]\n(這裡放翻譯後的繁體中文)\n[翻譯結束]";
-
-                const payload = {
-                    contents: [
-                        {
-                            parts: [
-                                { text: prompt },
-                                {
-                                    inlineData: {
-                                        mimeType: "image/jpeg",
-                                        data: imageBase64
-                                    }
-                                }
-                            ]
-                        }
-                    ]
-                };
-
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error?.message || `API 請求失敗，狀態碼：${response.status}`);
-                }
-
+                const payload = { contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/jpeg", data: imageBase64 } }] }] };
+                const response = await fetch(proxyUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 const result = await response.json();
-                
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    
-                    const responseText = result.candidates[0].content.parts[0].text;
-                    parseAndDisplayResults(responseText);
-
-                } else {
-                    throw new Error('API 回應格式不正確或沒有內容。');
-                }
-
+                if (!response.ok) { throw new Error(result.error?.message || `請求失敗，請稍後再試。`); }
+                if (result.candidates && result.candidates.length > 0) {
+                    parseAndDisplayResults(result.candidates[0].content.parts[0].text);
+                } else { throw new Error('API 回應格式不正確或沒有內容。'); }
             } catch (err) {
-                console.error('翻譯過程中發生錯誤:', err);
                 showError(err.message);
             } finally {
                 showLoading(false);
@@ -250,40 +134,25 @@
         function parseAndDisplayResults(text) {
             const originalMatch = text.match(/\[原文開始\]([\s\S]*?)\[原文結束\]/);
             const translatedMatch = text.match(/\[翻譯開始\]([\s\S]*?)\[翻譯結束\]/);
-
-            const extractedOriginal = originalMatch ? originalMatch[1].trim() : '無法辨識原文。';
-            const extractedTranslated = translatedMatch ? translatedMatch[1].trim() : '無法翻譯文字。';
-
-            originalText.textContent = extractedOriginal;
-            translatedText.textContent = extractedTranslated;
+            originalText.textContent = originalMatch ? originalMatch[1].trim() : '無法辨識原文。';
+            translatedText.textContent = translatedMatch ? translatedMatch[1].trim() : '無法翻譯文字。';
             resultContainer.classList.remove('hidden');
         }
 
-        /**
-         * **修改**: 顯示或隱藏載入狀態，可自訂文字
-         * @param {boolean} isLoading - 是否正在載入
-         * @param {string} [message=''] - 要顯示的訊息
-         */
         function showLoading(isLoading, message = '') {
-            if (isLoading) {
-                statusContainer.classList.remove('hidden');
-                loader.classList.remove('hidden');
-                statusText.textContent = message;
-                statusText.classList.remove('hidden');
-                errorMessage.classList.add('hidden');
-                translateBtn.disabled = true;
-            } else {
-                statusContainer.classList.add('hidden');
-                translateBtn.disabled = false;
-            }
+            statusContainer.classList.toggle('hidden', !isLoading);
+            loader.classList.toggle('hidden', !isLoading);
+            if (isLoading) { statusText.textContent = message; }
+            errorMessage.classList.add('hidden');
+            translateBtn.disabled = isLoading;
         }
 
         function showError(message) {
             statusContainer.classList.remove('hidden');
             loader.classList.add('hidden');
-            statusText.classList.add('hidden');
             errorMessage.classList.remove('hidden');
             errorText.textContent = message;
+            translateBtn.disabled = false;
         }
     </script>
 </body>
